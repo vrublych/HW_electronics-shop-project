@@ -1,5 +1,12 @@
 import csv
 
+
+class InstantiateCSVError(Exception):
+    def __init__(self, message="Файл item.csv поврежден"):
+        self.message = message
+        super().__init__(self.message)
+
+
 class Item:
     """
     Класс для представления товара в магазине.
@@ -56,13 +63,25 @@ class Item:
         else:
             self.__name = value
 
+    #@classmethod
+    #def instantiate_from_csv(cls, filename='..\\src\\items.csv'):
+    #    cls.all = []
+    #    with open(filename, newline='', encoding="windows-1251") as csvfile:
+    #       reader = csv.DictReader(csvfile)
+    #        for row in reader:
+    #            cls(row['name'], float(row['price']), int(row['quantity']))
+
     @classmethod
-    def instantiate_from_csv(cls, filename='src/items.csv'):
-        cls.all = []
-        with open(filename, newline='', encoding="windows-1251") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                cls(row['name'], float(row['price']), int(row['quantity']))
+    def instantiate_from_csv(cls, filename='..\\src\\items.csv'):
+        try:
+            with open(filename, newline='', encoding="windows-1251") as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    cls(row['name'], float(row['price']), int(row['quantity']))
+        except FileNotFoundError:
+            raise FileNotFoundError("Отсутствует файл item.csv")
+        except KeyError:
+            raise InstantiateCSVError("Файл item.csv поврежден")
 
     @staticmethod
     def string_to_number(value):

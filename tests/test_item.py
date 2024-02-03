@@ -1,6 +1,8 @@
 """Здесь надо написать тесты с использованием pytest для модуля item."""
-from src.item import Item
+from src.item import Item, InstantiateCSVError
 from src.phone import Phone
+import pytest
+from unittest.mock import patch
 
 
 def test_calculate_total_price():
@@ -50,3 +52,14 @@ def test_add():
     item1 = Item("Смартфон", 10000, 20)
     assert phone1 + phone1 == 10
     assert item1 + phone1 == 25
+
+
+def test_instantiate_from_csv_file_not_found():
+    with patch('builtins.open', side_effect=FileNotFoundError("File not found")):
+        with pytest.raises(FileNotFoundError):
+            Item.instantiate_from_csv()
+
+def test_instantiate_from_csv_key_error():
+    with patch('builtins.open', side_effect=KeyError("Key not found")):
+        with pytest.raises(InstantiateCSVError, match="Файл item.csv поврежден"):
+            Item.instantiate_from_csv()
